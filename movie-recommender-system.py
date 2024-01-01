@@ -139,6 +139,58 @@ movies['cast'] = movies['cast'].apply(convert3)
 
 # In[21]:
 
+movies.head()
+
+
+# In[22]:
+
+
+def fetch_director(obj):
+    l=[]
+    for i in ast.literal_eval(obj):
+        #this converts the above int o list of dict rather than in string
+        if i['job']=='Director':
+            l.append(i['name'])
+            break
+    return l
+
+
+# In[23]:
+
+
+movies['crew'] = movies['crew'].apply(fetch_director)
+
+
+# In[24]:
+
+
+movies['overview']=movies['overview'].apply(lambda x:x.split())
+
+
+# In[25]:
+
+
+movies['genres']=movies['genres'].apply(lambda x:[i.replace(" ","") for i in x])
+movies['keywords']=movies['keywords'].apply(lambda x:[i.replace(" ","") for i in x])
+movies['cast']=movies['cast'].apply(lambda x:[i.replace(" ","") for i in x])
+
+
+# In[26]:
+
+
+movies.head()
+
+
+# In[27]:
+
+
+movies['tags'] = movies['overview'] + movies['genres'] + movies['cast'] + movies['crew']
+
+
+# In[28]:
+
+
+movies.head()
 
 
 
