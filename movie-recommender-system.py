@@ -192,5 +192,108 @@ movies['tags'] = movies['overview'] + movies['genres'] + movies['cast'] + movies
 
 movies.head()
 
+# In[29]:
+
+
+new_df=movies[['movie_id','title','tags']]
+new_df
+
+
+# In[30]:
+
+
+new_df['tags']=new_df['tags'].apply(lambda x:" ".join(x))
+
+
+# In[31]:
+
+
+new_df.head()
+
+
+# In[32]:
+
+
+new_df['tags']=new_df['tags'].apply(lambda x:x.lower())
+
+
+# In[33]:
+
+
+new_df
+
+
+# In[34]:
+
+
+from sklearn.feature_extraction.text import CountVectorizer
+cv=CountVectorizer(max_features=5000,stop_words='english')
+#replaces similar words by common word
+
+
+# In[35]:
+
+
+from nltk.stem.porter import PorterStemmer
+ps=PorterStemmer()
+def stem(text):
+    y=[]
+    for i in text.split():
+        y.append(ps.stem(i))
+    return " ".join(y)
+
+
+# In[36]:
+
+
+new_df['tags'] = new_df['tags'].apply(stem)
+
+
+# In[37]:
+
+
+vectors=cv.fit_transform(new_df['tags']).toarray()
+
+
+# In[38]:
+
+
+cv.get_feature_names_out()
+
+
+# In[39]:
+
+
+from sklearn.metrics.pairwise import cosine_similarity
+similarity = cosine_similarity(vectors)
+
+
+# In[40]:
+
+
+similarity[2]
+
+
+# In[41]:
+
+
+def recommend(movie):
+    movie_index=new_df[new_df['title']==movie].index[0]
+    distances=similarity[movie_index]
+    movies_list=sorted(list(enumerate(distances)),reverse=True,key=lambda x:x[1])[1:6]
+    for i in movies_list:
+        print(new_df.iloc[i[0]].title)
+    return
+
+
+# In[52]:
+
+
+input_movie=input("Enter movie name: ")
+try:
+    recommend(input_movie)
+except:
+    print("Movie not found in database :( ")
+
 
 
